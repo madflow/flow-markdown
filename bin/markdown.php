@@ -1,4 +1,5 @@
 <?php
+
 require_once dirname(__FILE__).'/../src/Flow/Markdown/Parser.php';
 
 $file = array_key_exists(1,$argv) ? $argv[1] : null;
