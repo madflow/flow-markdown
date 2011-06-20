@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<map>
+    <item>
+        <markdown>
+            <definition># Heading 1</definition>
+            <definition>#Heading 1</definition>
+            <definition># Heading 1 #</definition>
+            <definition>#Heading 1#</definition>
+            <definition>Heading 1\n=========</definition>
+        </markdown>
+        <expected><![CDATA[<h1>Heading 1</h1>]]></expected>
+    </item>
+    <item>
+        <markdown>
+            <definition>## Heading 2</definition>
+            <definition>##Heading 2</definition>
+            <definition>## Heading 2 ##</definition>
+            <definition>##Heading 2##</definition>
+            <definition>Heading 2\n--------</definition>
+        </markdown>
+        <expected><![CDATA[<h2>Heading 2</h2>]]></expected>
+    </item>
+    <item>
+        <markdown>
+            <definition>### Heading 3</definition>
+            <definition>###Heading 3</definition>
+            <definition>### Heading 3 ###</definition>
+            <definition>###Heading 3###</definition>
+        </markdown>
+        <expected><![CDATA[<h3>Heading 3</h3>]]></expected>
+    </item>
+    <item>
+        <markdown>
+            <definition>#### Heading 4</definition>
+            <definition>####Heading 4</definition>
+            <definition>#### Heading 4 ####</definition>
+            <definition>####Heading 4####</definition>
+        </markdown>
+        <expected><![CDATA[<h4>Heading 4</h4>]]></expected>
+    </item>
+    <item>
+        <markdown>
+            <definition>##### Heading 5</definition>
+            <definition>#####Heading 5</definition>
+            <definition>##### Heading 5 #####</definition>
+            <definition>#####Heading 5#####</definition>
+        </markdown>
+        <expected><![CDATA[<h5>Heading 5</h5>]]></expected>
+    </item>
+    <item>
+        <markdown>
+            <definition>###### Heading 6</definition>
+            <definition>######Heading 6</definition>
+            <definition>###### Heading 6 ######</definition>
+            <definition>######Heading 6######</definition>
+        </markdown>
+        <expected><![CDATA[<h6>Heading 6</h6>]]></expected>
+    </item>
+    <item>
+        <markdown>
+            <definition>This is [an example](http://example.com/ "Title") inline link.</definition>
+        </markdown>
+        <expected><![CDATA[<p>This is <a href="http://example.com/" title="Title">an example</a> inline link.</p>]]></expected>
+    </item>
+</map>
