@@ -6,7 +6,7 @@
 
 ## What is this \Flow\Markdown\Parser
 
-This is script is a fork from php-markdown by Michel Fortin <http://michelf.com/>. The main work has been just refactoring the code for a PHP 5.3 environment.
+This script is a fork from php-markdown by Michel Fortin <http://michelf.com/>. The main work has been just refactoring the code for a PHP 5.3 environment.
 
 The plugins for Wordpress etc. have been dropped from the code.
 
