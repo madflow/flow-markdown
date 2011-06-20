@@ -25,7 +25,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     }
 
     public function testStandards()
-    {       
+    {
         $xml = simplexml_load_file(dirname(__FILE__).'/data/standard.xml');
         
         foreach ($xml->item as $item) 
@@ -47,5 +47,17 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $contentHtml = file_get_contents(dirname(__FILE__).'/data/Markdown.html');
         $parsedActual = $this->object->transform($content);
         $this->assertSame($contentHtml, $parsedActual);
+    }
+    
+    public function testExternalCases()
+    {
+        $dir = dirname(__FILE__).'/data/external';
+        $markdownFiles = glob($dir.'/*.text');
+        foreach ($markdownFiles as $file)
+        {
+            $expected = file_get_contents($file.'.html');
+            $actual = $this->object->transform(file_get_contents($file));
+            $this->assertSame($expected, $actual);
+        }
     }
 }

@@ -62,4 +62,16 @@
         </markdown>
         <expected><![CDATA[<p>This is <a href="http://example.com/" title="Title">an example</a> inline link.</p>]]></expected>
     </item>
+    <item>
+        <markdown>
+            <definition>[This link](http://example.net/) has no title attribute.</definition>
+        </markdown>
+        <expected><![CDATA[<p><a href="http://example.net/">This link</a> has no title attribute.</p>]]></expected>
+    </item>
+    <item>
+        <markdown>
+            <definition>\</definition>
+        </markdown>
+        <expected><![CDATA[<p>\</p>]]></expected>
+    </item>
 </map>

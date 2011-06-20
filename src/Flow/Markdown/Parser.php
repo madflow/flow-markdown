@@ -253,7 +253,8 @@ class Parser
         $link_id = strtolower($matches[1]);
         $url = $matches[2] == '' ? $matches[3] : $matches[2];
         $this->urls[$link_id] = $url;
-        $this->titles[$link_id] = array_key_exists(4, $matches) ? $matches[4] : null;
+        if(isset($matches[4]))
+            $this->titles[$link_id] = $matches[4];
         return ''; // String that will replace the block
     }
 
@@ -640,6 +641,7 @@ class Parser
             $url = $this->encodeAttribute($url);
 
             $result = "<a href=\"$url\"";
+
             if (isset($this->titles[$link_id]))
             {
                 $title = $this->titles[$link_id];
@@ -663,7 +665,8 @@ class Parser
         $whole_match = $matches[1];
         $link_text = $this->runSpanGamut($matches[2]);
         $url = $matches[3] == '' ? $matches[4] : $matches[3];
-        $title = isset($matches[7]) ? $matches[7] : '';
+        if(isset($matches[7]))
+            $title = $matches[7];
 
         $url = $this->encodeAttribute($url);
 
@@ -673,7 +676,7 @@ class Parser
             $title = $this->encodeAttribute($title);
             $result .= " title=\"$title\"";
         }
-
+        
         $link_text = $this->runSpanGamut($link_text);
         $result .= ">$link_text</a>";
 
