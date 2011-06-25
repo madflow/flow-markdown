@@ -3,6 +3,7 @@
 namespace Flow\Markdown;
 
 require_once dirname(__FILE__) . '/../src/Flow/Markdown/Parser.php';
+require_once dirname(__FILE__) . '/PhpMarkdown.php';
 
 /**
  * Test class for Parser.
@@ -14,6 +15,8 @@ class ParserTest extends \PHPUnit_Framework_TestCase
      * @var Parser
      */
     protected $object;
+    
+    protected $michelf;
 
     /**
      * Sets up the fixture, for example, opens a network connection.
@@ -22,6 +25,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->object = new Parser;
+        $this->michelf = new \Markdown_Parser();
     }
 
     public function testStandards()
@@ -47,17 +51,5 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $contentHtml = file_get_contents(dirname(__FILE__).'/data/Markdown.html');
         $parsedActual = $this->object->transform($content);
         $this->assertSame($contentHtml, $parsedActual);
-    }
-    
-    public function testExternalCases()
-    {
-        $dir = dirname(__FILE__).'/data/external';
-        $markdownFiles = glob($dir.'/*.text');
-        foreach ($markdownFiles as $file)
-        {
-            $expected = file_get_contents($file.'.html');
-            $actual = $this->object->transform(file_get_contents($file));
-            $this->assertSame($expected, $actual);
-        }
-    }
+    }    
 }

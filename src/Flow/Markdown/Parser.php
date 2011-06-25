@@ -3,19 +3,7 @@
 namespace Flow\Markdown;
 
 /**
- * Markdown  -  A text-to-HTML conversion tool for web writers
- * PHP Markdown
- * Copyright (c) 2004-2009 Michel Fortin  
- * <http://michelf.com/projects/php-markdown/>
- *
- * Original Markdown
- * Copyright (c) 2004-2006 John Gruber  
- * <http://daringfireball.net/projects/markdown/>
- * 
- */
-
-/**
- * Markdown Document Parser / Transformer
+ * Markdown Document Parser
  * 
  * Usage:
  * $parser = new \Flow\Markdown\Parser();
@@ -26,16 +14,35 @@ class Parser
     const MARKDOWN_EMPTY_ELEMENT_SUFFIX = ' />';
     const MARKDOWN_TAB_WIDTH = 4;
     
-    // Regex to match balanced [brackets].
-    // Needed to insert a maximum bracked depth while converting to PHP.
+    /**
+     * Maximum nested bracket depth
+     * 
+     * @var int
+     */
     protected $nestedBracketsDepth = 6;
-    protected $nestedBracketsRe;
+    
+    /**
+     * Regex to match balanced [brackets]
+     * 
+     * @var string 
+     */
+    protected $nestedBracketsRegex = '';
+    
+    /**
+     * 
+     * @var int
+     */
     protected $nestedUrlParenthesisDepth = 4;
-    protected $nestedUrlParenthesisRe;
+    
+    /**
+     *
+     * @var string
+     */
+    protected $nestedUrlParenthesisRegex = '';
 
     // Table of hash values for escaped characters:
     protected $escapeChars = '\`*_{}[]()>//+-.!';
-    protected $escapeCharsRe;
+    protected $escapeCharsRegex = '';
 
     // Change to ">" for HTML output.
     protected $emptyElementSuffix = self::MARKDOWN_EMPTY_ELEMENT_SUFFIX;
@@ -49,12 +56,22 @@ class Parser
     protected $predefUrls = array();
     protected $predefTitles = array();
     
-    // String length protected function for detab. `_initDetab` will create a protected function to 
-    // handle UTF-8 if the default protected function does not exist.
+    // String length protected function for detab. `_initDetab` will create a function to 
+    // handle UTF-8 if the default function does not exist.
     protected $utf8Strlen = 'mb_strlen';
     
-    // Internal hashes used during transformation.
+    /**
+     * Url hash used during transformation. 
+     * 
+     * @var array
+     */
     protected $urls = array();
+
+    /**
+     * Titles hash  used during transformation. 
+     * 
+     * @var array
+     */
     protected $titles = array();
     protected $htmlHashes = array();
 
@@ -125,15 +142,15 @@ class Parser
         $this->_initDetab();
         $this->prepareItalicsAndBold();
 
-        $this->nestedBracketsRe =
+        $this->nestedBracketsRegex =
                 str_repeat('(?>[^\[\]]+|\[', $this->nestedBracketsDepth) .
                 str_repeat('\])*', $this->nestedBracketsDepth);
 
-        $this->nestedUrlParenthesisRe =
+        $this->nestedUrlParenthesisRegex =
                 str_repeat('(?>[^()\s]+|\(', $this->nestedUrlParenthesisDepth) .
                 str_repeat('(?>\)))*', $this->nestedUrlParenthesisDepth);
 
-        $this->escapeCharsRe = '[' . preg_quote($this->escapeChars) . ']';
+        $this->escapeCharsRegex = '[' . preg_quote($this->escapeChars) . ']';
     }
    
 
@@ -561,7 +578,7 @@ class Parser
         $text = preg_replace_callback('{
                 (					# wrap whole match in $1
                   \[
-                        (' . $this->nestedBracketsRe . ')	# link text = $2
+                        (' . $this->nestedBracketsRegex . ')	# link text = $2
                   \]
 
                   [ ]?				# one optional space
@@ -577,14 +594,14 @@ class Parser
         $text = preg_replace_callback('{
                 (				# wrap whole match in $1
                   \[
-                        (' . $this->nestedBracketsRe . ')	# link text = $2
+                        (' . $this->nestedBracketsRegex . ')	# link text = $2
                   \]
                   \(			# literal paren
                         [ \n]*
                         (?:
                                 <(.+?)>	# href = $3
                         |
-                                (' . $this->nestedUrlParenthesisRe . ')	# href = $4
+                                (' . $this->nestedUrlParenthesisRegex . ')	# href = $4
                         )
                         [ \n]*
                         (			# $5
@@ -694,7 +711,7 @@ class Parser
 		$text = preg_replace_callback('{
 			(				# wrap whole match in $1
 			  !\[
-				(' . $this->nestedBracketsRe . ')		# alt text = $2
+				(' . $this->nestedBracketsRegex . ')		# alt text = $2
 			  \]
 
 			  [ ]?				# one optional space
@@ -714,7 +731,7 @@ class Parser
 		$text = preg_replace_callback('{
 			(				# wrap whole match in $1
 			  !\[
-				(' . $this->nestedBracketsRe . ')		# alt text = $2
+				(' . $this->nestedBracketsRegex . ')		# alt text = $2
 			  \]
 			  \s?			# One optional whitespace character
 			  \(			# literal paren
@@ -722,7 +739,7 @@ class Parser
 				(?:
 					<(\S*)>	# src url = $3
 				|
-					(' . $this->nestedUrlParenthesisRe . ')	# src url = $4
+					(' . $this->nestedUrlParenthesisRegex . ')	# src url = $4
 				)
 				[ \n]*
 				(			# $5
@@ -1490,7 +1507,7 @@ class Parser
 
         $span_re = '{
 				(
-					\\\\' . $this->escapeCharsRe . '
+					\\\\' . $this->escapeCharsRegex . '
 				|
 					(?<![`\\\\])
 					`+						# code span marker
