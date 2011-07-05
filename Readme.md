@@ -18,7 +18,7 @@ The plugins for Wordpress etc. have been dropped from the code.
 
 - Add Flow\(Markdown) namespace to your autoloader.
 - Create instance and happily transform markdown to HTML. 
-   - $parser = new \Flow\Mardown\Parser();
+   - $parser = new \Flow\Markdown\Parser();
    - $html = $parser->transform('# Markdown String');
 
 # Authors
