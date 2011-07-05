@@ -40,24 +40,68 @@ class Parser
      */
     protected $nestedUrlParenthesisRegex = '';
 
-    // Table of hash values for escaped characters:
+    /**
+     * Table of hash values for escaped characters
+     * 
+     * @var string
+     */
     protected $escapeChars = '\`*_{}[]()>//+-.!';
+    
+    /**
+     * escapeCharsRegex 
+     * 
+     * @var string
+     */
     protected $escapeCharsRegex = '';
 
-    // Change to ">" for HTML output.
+    /**
+     * Change to ">" for HTML output.
+     * 
+     * @var mixed
+     */
     protected $emptyElementSuffix = self::MARKDOWN_EMPTY_ELEMENT_SUFFIX;
+    
+    /**
+     * tabWidth 
+     * 
+     * @var mixed
+     */
     protected $tabWidth = self::MARKDOWN_TAB_WIDTH;
 
-    // Change to true to disallow markup or entities.
+    /**
+     *  Change to true to disallow markup or entities.
+     * 
+     * @var mixed
+     */
     protected $noMarkup = false;
+    
+    /**
+     * noEntities 
+     * 
+     * @var mixed
+     */
     protected $noEntities = false;
 
-    // Predefined urls and titles for reference links and images.
+    /**
+     * Predefined urls and titles for reference links and images.
+     * 
+     * @var array
+     */
     protected $predefUrls = array();
+    
+    /**
+     * predefTitles 
+     * 
+     * @var array
+     */
     protected $predefTitles = array();
     
-    // String length protected function for detab. `_initDetab` will create a function to 
-    // handle UTF-8 if the default function does not exist.
+    /**
+     * String length protected function for detab. `_initDetab` will create a function to 
+     * handle UTF-8 if the default function does not exist.
+     * 
+     * @var string
+     */
     protected $utf8Strlen = 'mb_strlen';
     
     /**
@@ -75,15 +119,29 @@ class Parser
     protected $titles = array();
     protected $htmlHashes = array();
 
-    // Status flag to avoid invalid nesting.
+    /**
+     * Status flag to avoid invalid nesting.
+     * 
+     * @var mixed
+     */
     protected $inAnchor = false;
     
+    /**
+     * documentGamut 
+     * 
+     * @var array
+     */
     protected $documentGamut = array(
         // Strip link definitions, store in hashes.
         "stripLinkDefinitions" => 20,
         "runBasicBlockGamut" => 30,
     );
     
+    /**
+     * blockGamut 
+     * 
+     * @var array
+     */
     protected $blockGamut = array(
         // These are all the transformations that form block-level
         // tags like paragraphs, headers, and list items.
@@ -94,6 +152,11 @@ class Parser
         "doBlockQuotes" => 60,
     );
     
+    /**
+     * spanGamut 
+     * 
+     * @var array
+     */
     protected $spanGamut = array(
         //
         // These are all the transformations that occur *within* block-level
@@ -115,28 +178,56 @@ class Parser
         "doHardBreaks" => 60,
     );
     
+    /**
+     * emRelist 
+     * 
+     * @var array
+     */
     protected $emRelist = array(
         '' => '(?:(?<!\*)\*(?!\*)|(?<!_)_(?!_))(?=\S|$)(?![.,:;]\s)',
         '*' => '(?<=\S|^)(?<!\*)\*(?!\*)',
         '_' => '(?<=\S|^)(?<!_)_(?!_)',
     );
     
+    /**
+     * strongRelist 
+     * 
+     * @var array
+     */
     protected $strongRelist = array(
         '' => '(?:(?<!\*)\*\*(?!\*)|(?<!_)__(?!_))(?=\S|$)(?![.,:;]\s)',
         '**' => '(?<=\S|^)(?<!\*)\*\*(?!\*)',
         '__' => '(?<=\S|^)(?<!_)__(?!_)',
     );
     
+    /**
+     * emStrongRelist 
+     * 
+     * @var array
+     */
     protected $emStrongRelist = array(
         '' => '(?:(?<!\*)\*\*\*(?!\*)|(?<!_)___(?!_))(?=\S|$)(?![.,:;]\s)',
         '***' => '(?<=\S|^)(?<!\*)\*\*\*(?!\*)',
         '___' => '(?<=\S|^)(?<!_)___(?!_)',
     );
     
+    /**
+     * emStrongPreparedRelist 
+     * 
+     * @var mixed
+     */
     protected $emStrongPreparedRelist;
     
+    /**
+     * listLevel 
+     * 
+     * @var int
+     */
     protected $listLevel = 0;
 
+    /**
+     * Constructor
+     */
     public function __construct()
     {        
         $this->_initDetab();
@@ -487,8 +578,8 @@ class Parser
      * useful when HTML blocks are known to be already hashed, like in the first
      * whole-document pass.
      *  
-     * @param type $text
-     * @return type 
+     * @param string $text
+     * @return string
      */
     protected function runBasicBlockGamut($text)
     {
@@ -1500,6 +1591,7 @@ class Parser
      * escaped characters and handling code spans.
      * 
      * @param string $str
+     * @return string
      */
     protected function parseSpan($str)
     {        
@@ -1599,6 +1691,7 @@ class Parser
      * Replace tabs with the appropriate amount of space.
      * 
      * @param string $text
+     * @return string
      */
     protected function detab($text)
     {
