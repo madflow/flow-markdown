@@ -13,89 +13,77 @@ class Parser
 {
     const MARKDOWN_EMPTY_ELEMENT_SUFFIX = ' />';
     const MARKDOWN_TAB_WIDTH = 4;
-    
+
     /**
      * Maximum nested bracket depth
      * 
      * @var int
      */
     protected $nestedBracketsDepth = 6;
-    
     /**
      * Regex to match balanced [brackets]
      * 
      * @var string 
      */
     protected $nestedBracketsRegex = '';
-    
     /**
      * 
      * @var int
      */
     protected $nestedUrlParenthesisDepth = 4;
-    
     /**
      *
      * @var string
      */
     protected $nestedUrlParenthesisRegex = '';
-
     /**
      * Table of hash values for escaped characters
      * 
      * @var string
      */
     protected $escapeChars = '\`*_{}[]()>//+-.!';
-    
     /**
      * escapeCharsRegex 
      * 
      * @var string
      */
     protected $escapeCharsRegex = '';
-
     /**
      * Change to ">" for HTML output.
      * 
      * @var mixed
      */
     protected $emptyElementSuffix = self::MARKDOWN_EMPTY_ELEMENT_SUFFIX;
-    
     /**
      * tabWidth 
      * 
      * @var mixed
      */
     protected $tabWidth = self::MARKDOWN_TAB_WIDTH;
-
     /**
      *  Change to true to disallow markup or entities.
      * 
      * @var mixed
      */
     protected $noMarkup = false;
-    
     /**
      * noEntities 
      * 
      * @var mixed
      */
     protected $noEntities = false;
-
     /**
      * Predefined urls and titles for reference links and images.
      * 
      * @var array
      */
     protected $predefUrls = array();
-    
     /**
      * predefTitles 
      * 
      * @var array
      */
     protected $predefTitles = array();
-    
     /**
      * String length protected function for detab. `_initDetab` will create a function to 
      * handle UTF-8 if the default function does not exist.
@@ -103,29 +91,29 @@ class Parser
      * @var string
      */
     protected $utf8Strlen = 'mb_strlen';
-    
     /**
      * Url hash used during transformation. 
      * 
      * @var array
      */
     protected $urls = array();
-
     /**
      * Titles hash  used during transformation. 
      * 
      * @var array
      */
     protected $titles = array();
+    /**
+     * 
+     * @var array
+     */
     protected $htmlHashes = array();
-
     /**
      * Status flag to avoid invalid nesting.
      * 
      * @var mixed
      */
     protected $inAnchor = false;
-    
     /**
      * documentGamut 
      * 
@@ -136,7 +124,6 @@ class Parser
         "stripLinkDefinitions" => 20,
         "runBasicBlockGamut" => 30,
     );
-    
     /**
      * blockGamut 
      * 
@@ -151,7 +138,6 @@ class Parser
         "doCodeBlocks" => 50,
         "doBlockQuotes" => 60,
     );
-    
     /**
      * spanGamut 
      * 
@@ -177,7 +163,6 @@ class Parser
         "doItalicsAndBold" => 50,
         "doHardBreaks" => 60,
     );
-    
     /**
      * emRelist 
      * 
@@ -188,7 +173,6 @@ class Parser
         '*' => '(?<=\S|^)(?<!\*)\*(?!\*)',
         '_' => '(?<=\S|^)(?<!_)_(?!_)',
     );
-    
     /**
      * strongRelist 
      * 
@@ -199,7 +183,6 @@ class Parser
         '**' => '(?<=\S|^)(?<!\*)\*\*(?!\*)',
         '__' => '(?<=\S|^)(?<!_)__(?!_)',
     );
-    
     /**
      * emStrongRelist 
      * 
@@ -210,14 +193,12 @@ class Parser
         '***' => '(?<=\S|^)(?<!\*)\*\*\*(?!\*)',
         '___' => '(?<=\S|^)(?<!_)___(?!_)',
     );
-    
     /**
      * emStrongPreparedRelist 
      * 
      * @var mixed
      */
     protected $emStrongPreparedRelist;
-    
     /**
      * listLevel 
      * 
@@ -229,7 +210,7 @@ class Parser
      * Constructor
      */
     public function __construct()
-    {        
+    {
         $this->_initDetab();
         $this->prepareItalicsAndBold();
 
@@ -243,13 +224,12 @@ class Parser
 
         $this->escapeCharsRegex = '[' . preg_quote($this->escapeChars) . ']';
     }
-   
 
     /**
      * Called before the transformation process starts to setup parser states.
      */
     protected function setup()
-    {    
+    {
         // Clear global hashes.
         $this->urls = $this->predefUrls;
         $this->titles = $this->predefTitles;
@@ -267,7 +247,7 @@ class Parser
         $this->titles = array();
         $this->htmlHashes = array();
     }
-    
+
     /**
      * Main function. Performs some preprocessing on the input text
      * and pass it through the document gamut.
@@ -277,7 +257,7 @@ class Parser
      */
     public function transform($text)
     {
-        
+
         $this->setup();
 
         // Remove UTF-8 BOM and marker character in input, if present.
@@ -300,12 +280,11 @@ class Parser
         // This makes subsequent regexen easier to write, because we can
         // match consecutive blank lines with /\n+/ instead of something
         // contorted like /[ ]*\n+/ .
-        
+
         $text = preg_replace('/^[ ]+$/m', '', $text);
 
         // Run document gamut methods.
-        foreach ($this->documentGamut as $method => $priority)
-        {
+        foreach ($this->documentGamut as $method => $priority) {
             $text = $this->$method($text);
         }
 
@@ -361,7 +340,7 @@ class Parser
         $link_id = strtolower($matches[1]);
         $url = $matches[2] == '' ? $matches[3] : $matches[2];
         $this->urls[$link_id] = $url;
-        if(isset($matches[4]))
+        if (isset($matches[4]))
             $this->titles[$link_id] = $matches[4];
         return ''; // String that will replace the block
     }
@@ -390,7 +369,7 @@ class Parser
             return $text;
 
         $less_than_tab = $this->tabWidth - 1;
-        
+
         $block_tags_a_re = 'ins|del';
         $block_tags_b_re = 'p|div|h[1-6]|blockquote|pre|table|dl|ol|ul|address|' .
                 'script|noscript|form|fieldset|iframe|math';
@@ -527,7 +506,7 @@ class Parser
      */
     protected function hashPart($text, $boundary = 'X')
     {
-	// The $boundary argument specify what character should be used to surround
+        // The $boundary argument specify what character should be used to surround
         // the token. By convension, "B" is used for block elements that needs not
         // to be wrapped into paragraph tags at the end, ":" is used for elements
         // that are word separators and "X" is used in the general case.
@@ -583,8 +562,7 @@ class Parser
      */
     protected function runBasicBlockGamut($text)
     {
-        foreach ($this->blockGamut as $method => $priority)
-        {
+        foreach ($this->blockGamut as $method => $priority) {
             $text = $this->$method($text);
         }
 
@@ -623,8 +601,7 @@ class Parser
      */
     protected function runSpanGamut($text)
     {
-        foreach ($this->spanGamut as $method => $priority)
-        {
+        foreach ($this->spanGamut as $method => $priority) {
             $text = $this->$method($text);
         }
 
@@ -659,10 +636,10 @@ class Parser
      * @return string
      */
     protected function doAnchors($text)
-    {        
+    {
         if ($this->inAnchor)
             return $text;
-        
+
         $this->inAnchor = true;
 
         // First, handle reference-style links: [link text] [id]
@@ -733,8 +710,7 @@ class Parser
         $link_text = $matches[2];
         $link_id = isset($matches[3]) ? $matches[3] : '';
 
-        if ($link_id == "")
-        {
+        if ($link_id == "") {
             // for shortcut links like [this][] or [this].
             $link_id = $link_text;
         }
@@ -743,15 +719,13 @@ class Parser
         $link_id = strtolower($link_id);
         $link_id = preg_replace('{[ ]?\n}', ' ', $link_id);
 
-        if (isset($this->urls[$link_id]))
-        {
+        if (isset($this->urls[$link_id])) {
             $url = $this->urls[$link_id];
             $url = $this->encodeAttribute($url);
 
             $result = "<a href=\"$url\"";
 
-            if (isset($this->titles[$link_id]))
-            {
+            if (isset($this->titles[$link_id])) {
                 $title = $this->titles[$link_id];
                 $title = $this->encodeAttribute($title);
                 $result .= " title=\"$title\"";
@@ -760,9 +734,7 @@ class Parser
             $link_text = $this->runSpanGamut($link_text);
             $result .= ">$link_text</a>";
             $result = $this->hashPart($result);
-        }
-        else
-        {
+        } else {
             $result = $whole_match;
         }
         return $result;
@@ -773,18 +745,17 @@ class Parser
         $whole_match = $matches[1];
         $link_text = $this->runSpanGamut($matches[2]);
         $url = $matches[3] == '' ? $matches[4] : $matches[3];
-        if(isset($matches[7]))
+        if (isset($matches[7]))
             $title = $matches[7];
 
         $url = $this->encodeAttribute($url);
 
         $result = "<a href=\"$url\"";
-        if (isset($title))
-        {
+        if (isset($title)) {
             $title = $this->encodeAttribute($title);
             $result .= " title=\"$title\"";
         }
-        
+
         $link_text = $this->runSpanGamut($link_text);
         $result .= ">$link_text</a>";
 
@@ -852,27 +823,22 @@ class Parser
         $alt_text = $matches[2];
         $link_id = strtolower($matches[3]);
 
-        if ($link_id == "")
-        {
+        if ($link_id == "") {
             $link_id = strtolower($alt_text); # for shortcut links like ![this][].
         }
 
         $alt_text = $this->encodeAttribute($alt_text);
-        if (isset($this->urls[$link_id]))
-        {
+        if (isset($this->urls[$link_id])) {
             $url = $this->encodeAttribute($this->urls[$link_id]);
             $result = "<img src=\"$url\" alt=\"$alt_text\"";
-            if (isset($this->titles[$link_id]))
-            {
+            if (isset($this->titles[$link_id])) {
                 $title = $this->titles[$link_id];
                 $title = $this->encodeAttribute($title);
                 $result .= " title=\"$title\"";
             }
             $result .= $this->emptyElementSuffix;
             $result = $this->hashPart($result);
-        }
-        else
-        {
+        } else {
             # If there's no such link ID, leave intact:
             $result = $whole_match;
         }
@@ -890,8 +856,7 @@ class Parser
         $alt_text = $this->encodeAttribute($alt_text);
         $url = $this->encodeAttribute($url);
         $result = "<img src=\"$url\" alt=\"$alt_text\"";
-        if (isset($title))
-        {
+        if (isset($title)) {
             $title = $this->encodeAttribute($title);
             $result .= " title=\"$title\""; # $title already quoted
         }
@@ -965,8 +930,7 @@ class Parser
             $marker_ol_re => $marker_ul_re,
         );
 
-        foreach ($markers_relist as $marker_re => $other_marker_re)
-        {
+        foreach ($markers_relist as $marker_re => $other_marker_re) {
             # Re-usable pattern to match any entirel ul or ol list:
             $whole_list_re = '
 				(								# $1 = whole list
@@ -997,15 +961,12 @@ class Parser
             # We use a different prefix before nested lists than top-level lists.
             # See extended comment in _ProcessListItems().
 
-            if ($this->listLevel)
-            {
+            if ($this->listLevel) {
                 $text = preg_replace_callback('{
 						^
 						' . $whole_list_re . '
 					}mx', array(&$this, '_doLists_callback'), $text);
-            }
-            else
-            {
+            } else {
                 $text = preg_replace_callback('{
 						(?:(?<=\n)\n|\A\n?) # Must eat the newline
 						' . $whole_list_re . '
@@ -1034,8 +995,6 @@ class Parser
         $result = $this->hashBlock("<$list_type>\n" . $result . "</$list_type>");
         return "\n" . $result . "\n\n";
     }
-    
-    
 
     protected function processListItems($list_str, $marker_any_re)
     {
@@ -1093,14 +1052,11 @@ class Parser
         $tailing_blank_line = & $matches[5];
 
         if ($leading_line || $tailing_blank_line ||
-                preg_match('/\n{2,}/', $item))
-        {
+                preg_match('/\n{2,}/', $item)) {
             # Replace marker with the appropriate whitespace indentation
             $item = $leading_space . str_repeat(' ', strlen($marker_space)) . $item;
             $item = $this->runBlockGamut($this->outdent($item) . "\n");
-        }
-        else
-        {
+        } else {
             # Recursion for sub-lists:
             $item = $this->doLists($this->outdent($item));
             $item = preg_replace('/\n+$/', '', $item);
@@ -1159,14 +1115,11 @@ class Parser
         # context.
         #
         
-        foreach ($this->emRelist as $em => $em_re)
-        {
-            foreach ($this->strongRelist as $strong => $strong_re)
-            {
+        foreach ($this->emRelist as $em => $em_re) {
+            foreach ($this->strongRelist as $strong => $strong_re) {
                 # Construct list of allowed token expressions.
                 $token_relist = array();
-                if (isset($this->emStrongRelist["$em$strong"]))
-                {
+                if (isset($this->emStrongRelist["$em$strong"])) {
                     $token_relist[] = $this->emStrongRelist["$em$strong"];
                 }
                 $token_relist[] = $em_re;
@@ -1187,8 +1140,7 @@ class Parser
         $strong = '';
         $tree_char_em = false;
 
-        while (1)
-        {
+        while (1) {
             #
             # Get prepared regular expression for seraching emphasis tokens
             # in current context.
@@ -1204,12 +1156,10 @@ class Parser
             $token = & $parts[1];
             $text = & $parts[2];
 
-            if (empty($token))
-            {
+            if (empty($token)) {
                 # Reached end of text span: empty stack without emitting.
                 # any more emphasis.
-                while ($token_stack[0])
-                {
+                while ($token_stack[0]) {
                     $text_stack[1] .= array_shift($token_stack);
                     $text_stack[0] .= array_shift($text_stack);
                 }
@@ -1217,11 +1167,9 @@ class Parser
             }
 
             $token_len = strlen($token);
-            if ($tree_char_em)
-            {
+            if ($tree_char_em) {
                 # Reached closing marker while inside a three-char emphasis.
-                if ($token_len == 3)
-                {
+                if ($token_len == 3) {
                     # Three-char closing marker, close em and strong.
                     array_shift($token_stack);
                     $span = array_shift($text_stack);
@@ -1230,9 +1178,7 @@ class Parser
                     $text_stack[0] .= $this->hashPart($span);
                     $em = '';
                     $strong = '';
-                }
-                else
-                {
+                } else {
                     # Other closing marker: close one em or strong and
                     # change current token state to match the other
                     $token_stack[0] = str_repeat($token{0}, 3 - $token_len);
@@ -1244,15 +1190,11 @@ class Parser
                     $$tag = ''; # $$tag stands for $em or $strong
                 }
                 $tree_char_em = false;
-            }
-            else if ($token_len == 3)
-            {
-                if ($em)
-                {
+            } else if ($token_len == 3) {
+                if ($em) {
                     # Reached closing marker for both em and strong.
                     # Closing strong marker:
-                    for ($i = 0; $i < 2; ++$i)
-                    {
+                    for ($i = 0; $i < 2; ++$i) {
                         $shifted_token = array_shift($token_stack);
                         $tag = strlen($shifted_token) == 2 ? "strong" : "em";
                         $span = array_shift($text_stack);
@@ -1261,9 +1203,7 @@ class Parser
                         $text_stack[0] .= $this->hashPart($span);
                         $$tag = ''; # $$tag stands for $em or $strong
                     }
-                }
-                else
-                {
+                } else {
                     # Reached opening three-char emphasis marker. Push on token 
                     # stack; will be handled by the special condition above.
                     $em = $token{0};
@@ -1272,14 +1212,10 @@ class Parser
                     array_unshift($text_stack, '');
                     $tree_char_em = true;
                 }
-            }
-            else if ($token_len == 2)
-            {
-                if ($strong)
-                {
+            } else if ($token_len == 2) {
+                if ($strong) {
                     # Unwind any dangling emphasis marker:
-                    if (strlen($token_stack[0]) == 1)
-                    {
+                    if (strlen($token_stack[0]) == 1) {
                         $text_stack[1] .= array_shift($token_stack);
                         $text_stack[0] .= array_shift($text_stack);
                     }
@@ -1290,21 +1226,15 @@ class Parser
                     $span = "<strong>$span</strong>";
                     $text_stack[0] .= $this->hashPart($span);
                     $strong = '';
-                }
-                else
-                {
+                } else {
                     array_unshift($token_stack, $token);
                     array_unshift($text_stack, '');
                     $strong = $token;
                 }
-            }
-            else
-            {
+            } else {
                 # Here $token_len == 1
-                if ($em)
-                {
-                    if (strlen($token_stack[0]) == 1)
-                    {
+                if ($em) {
+                    if (strlen($token_stack[0]) == 1) {
                         # Closing emphasis marker:
                         array_shift($token_stack);
                         $span = array_shift($text_stack);
@@ -1312,14 +1242,10 @@ class Parser
                         $span = "<em>$span</em>";
                         $text_stack[0] .= $this->hashPart($span);
                         $em = '';
-                    }
-                    else
-                    {
+                    } else {
                         $text_stack[0] .= $token;
                     }
-                }
-                else
-                {
+                } else {
                     array_unshift($token_stack, $token);
                     array_unshift($text_stack, '');
                     $em = $token;
@@ -1381,18 +1307,14 @@ class Parser
         #
         # Wrap <p> tags and unhashify HTML blocks
         #
-		foreach ($grafs as $key => $value)
-        {
-            if (!preg_match('/^B\x1A[0-9]+B$/', $value))
-            {
+		foreach ($grafs as $key => $value) {
+            if (!preg_match('/^B\x1A[0-9]+B$/', $value)) {
                 # Is a paragraph.
                 $value = $this->runSpanGamut($value);
                 $value = preg_replace('/^([ ]*)/', "<p>", $value);
                 $value .= "</p>";
                 $grafs[$key] = $this->unhash($value);
-            }
-            else
-            {
+            } else {
                 # Is a block.
                 # Modify elements of @grafs in-place...
                 $graf = $value;
@@ -1448,7 +1370,7 @@ class Parser
      * @return string 
      */
     protected function encodeAttribute($text)
-    {        
+    {
         $text = $this->encodeAmpsAndAngles($text);
         $text = str_replace('"', '&quot;', $text);
         return $text;
@@ -1464,17 +1386,14 @@ class Parser
      */
     protected function encodeAmpsAndAngles($text)
     {
-        if ($this->noEntities)
-        {
+        if ($this->noEntities) {
             $text = str_replace('&', '&amp;', $text);
-        }
-        else
-        {
+        } else {
             // Ampersand-encoding based entirely on Nat Irons's Amputator
             // MT plugin: <http://bumppo.net/projects/amputator/>
             $text = preg_replace('/&(?!#?[xX]?(?:[0-9a-fA-F]+|\w+);)/', '&amp;', $text);
         }
-        
+
         // Encode remaining <'s
         $text = str_replace('<', '&lt;', $text);
 
@@ -1556,17 +1475,15 @@ class Parser
      * @return string 
      */
     protected function encodeEmailAddress($addr)
-    {   
+    {
         $addr = "mailto:" . $addr;
         $chars = preg_split('/(?<!^)(?!$)/', $addr);
         $seed = (int) abs(crc32($addr) / strlen($addr)); # Deterministic seed.
 
-        foreach ($chars as $key => $char)
-        {
+        foreach ($chars as $key => $char) {
             $ord = ord($char);
             // Ignore non-ascii chars.
-            if ($ord < 128)
-            {
+            if ($ord < 128) {
                 $r = ($seed * (1 + $key)) % 100; // Pseudo-random function.
                 // roughly 10% raw, 45% hex, 45% dec
                 // '@' *must* be encoded. I insist.
@@ -1581,11 +1498,11 @@ class Parser
 
         $addr = implode('', $chars);
         $text = implode('', array_slice($chars, 7)); # text without `mailto:`
-        $addr = '<a href="' . $addr .'">' . $text. '</a>';
+        $addr = '<a href="' . $addr . '">' . $text . '</a>';
 
         return $addr;
     }
-    
+
     /**
      * Take the string $str and parse it into tokens, hashing embeded HTML,
      * escaped characters and handling code spans.
@@ -1594,7 +1511,7 @@ class Parser
      * @return string
      */
     protected function parseSpan($str)
-    {        
+    {
         $output = '';
 
         $span_re = '{
@@ -1619,27 +1536,22 @@ class Parser
 				)
 				}xs';
 
-        while (1)
-        {
+        while (1) {
             // Each loop iteration seach for either the next tag, the next 
             // openning code span marker, or the next escaped character. 
             // Each token is then passed to handleSpanToken.
-			$parts = preg_split($span_re, $str, 2, PREG_SPLIT_DELIM_CAPTURE);
+            $parts = preg_split($span_re, $str, 2, PREG_SPLIT_DELIM_CAPTURE);
 
             // Create token from text preceding tag.
-            if ($parts[0] != "")
-            {
+            if ($parts[0] != "") {
                 $output .= $parts[0];
             }
 
             // Check if we reach the end.
-            if (isset($parts[1]))
-            {
+            if (isset($parts[1])) {
                 $output .= $this->handleSpanToken($parts[1], $parts[2]);
                 $str = $parts[2];
-            }
-            else
-            {
+            } else {
                 break;
             }
         }
@@ -1657,14 +1569,12 @@ class Parser
      */
     protected function handleSpanToken($token, &$str)
     {
-        switch ($token{0})
-        {
+        switch ($token{0}) {
             case "\\":
                 return $this->hashPart("&#" . ord($token{1}) . ";");
             case "`":
                 # Search for end marker in remaining text.
-                if (preg_match('/^(.*?[^`])' . preg_quote($token) . '(?!`)(.*)$/sm', $str, $matches))
-                {
+                if (preg_match('/^(.*?[^`])' . preg_quote($token) . '(?!`)(.*)$/sm', $str, $matches)) {
                     $str = $matches[2];
                     $codespan = $this->makeCodeSpan($matches[1]);
                     return $this->hashPart($codespan);
@@ -1686,7 +1596,6 @@ class Parser
         return preg_replace('/^(\t|[ ]{1,' . $this->tabWidth . '})/m', '', $text);
     }
 
-
     /**
      * Replace tabs with the appropriate amount of space.
      * 
@@ -1698,7 +1607,7 @@ class Parser
         // For each line we separate the line in blocks delemited by
         // tab characters. Then we reconstruct every line by adding the 
         // appropriate number of space between each blocks.
-        
+
         $text = preg_replace_callback('/^.*\t.*$/m', array(&$this, '_detab_callback'), $text);
 
         return $text;
@@ -1718,8 +1627,7 @@ class Parser
         // Add each blocks to the line.
         $line = $blocks[0];
         unset($blocks[0]); // Do not add first block twice.
-        foreach ($blocks as $block)
-        {
+        foreach ($blocks as $block) {
             // Calculate amount of space, insert spaces, insert block.
             $amount = $this->tabWidth -
                     $strlen($line, 'UTF-8') % $this->tabWidth;
@@ -1738,12 +1646,11 @@ class Parser
     {
         if (function_exists($this->utf8Strlen))
             return;
-        
+
         $this->utf8Strlen = function($text) {
-            return preg_match_all(
-			"/[\\\\x00-\\\\xBF]|[\\\\xC0-\\\\xFF][\\\\x80-\\\\xBF]*/", 
-			$text, $matches);
-        };
+                    return preg_match_all(
+                            "/[\\\\x00-\\\\xBF]|[\\\\xC0-\\\\xFF][\\\\x80-\\\\xBF]*/", $text, $matches);
+                };
     }
 
     /**
@@ -1763,7 +1670,7 @@ class Parser
     }
 }
 
-  /*
+/*
 
   PHP Markdown
   ============
