@@ -25,7 +25,7 @@ class ExternalTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->object = new Parser;
-        $this->michelf = new \Markdown_Parser();
+        //$this->michelf = new \Markdown_Parser();
     }
 
     public function testExternalCases()
