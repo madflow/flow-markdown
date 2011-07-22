@@ -6,84 +6,100 @@ namespace Flow\Markdown;
  * Markdown Document Parser
  * 
  * Usage:
+ * 
  * $parser = new \Flow\Markdown\Parser();
  * $html = $parser->transform('# Heading 1'); // <h1>Heading 1</h1>
+ * 
  */
 class Parser
 {
-    const MARKDOWN_EMPTY_ELEMENT_SUFFIX = ' />';
-    const MARKDOWN_TAB_WIDTH = 4;
-
     /**
-     * Maximum nested bracket depth
+     * Maximum nested bracket depth.
      * 
      * @var int
      */
     protected $nestedBracketsDepth = 6;
+    
     /**
-     * Regex to match balanced [brackets]
+     * Pattern to match balanced [brackets].
+     * [this] and [this[also]] and [this[also[too]]]
+     * up to $nestedBracketsDepth.
+     * 
+     * The pattern is dynamically generated in a @see Parser::setup() method.
      * 
      * @var string 
      */
-    protected $nestedBracketsRegex = '';
+    protected $nestedBracketsPattern = '';
+    
     /**
      * 
      * @var int
      */
     protected $nestedUrlParenthesisDepth = 4;
+    
     /**
      *
      * @var string
      */
-    protected $nestedUrlParenthesisRegex = '';
+    protected $nestedUrlParenthesisPattern = '';
+    
     /**
      * Table of hash values for escaped characters
      * 
      * @var string
      */
     protected $escapeChars = '\`*_{}[]()>//+-.!';
+    
     /**
      * escapeCharsRegex 
      * 
      * @var string
      */
-    protected $escapeCharsRegex = '';
+    protected $escapeCharsPattern = '';
+    
     /**
      * Change to ">" for HTML output.
      * 
-     * @var mixed
+     * @var string
      */
-    protected $emptyElementSuffix = self::MARKDOWN_EMPTY_ELEMENT_SUFFIX;
+    protected $emptyElementSuffix = ' />';
+    
     /**
-     * tabWidth 
+     * Tabs are automatically converted to spaces as part of the transformation
+     * this variable determines how "wide" those tabs become in spaces
      * 
-     * @var mixed
+     * @var int
      */
-    protected $tabWidth = self::MARKDOWN_TAB_WIDTH;
+    protected $tabWidth = 4;
+    
     /**
-     *  Change to true to disallow markup or entities.
+     *  Change to true to disallow markup
      * 
-     * @var mixed
+     * @var boolean
      */
     protected $noMarkup = false;
+    
     /**
-     * noEntities 
+     *  Change to true to disallow entities.
      * 
-     * @var mixed
+     * @var boolean
      */
     protected $noEntities = false;
+    
     /**
      * Predefined urls and titles for reference links and images.
      * 
      * @var array
      */
     protected $predefUrls = array();
+    
     /**
      * predefTitles 
      * 
      * @var array
      */
     protected $predefTitles = array();
+    
     /**
      * String length protected function for detab. `_initDetab` will create a function to 
      * handle UTF-8 if the default function does not exist.
@@ -91,29 +107,34 @@ class Parser
      * @var string
      */
     protected $utf8Strlen = 'mb_strlen';
+    
     /**
      * Url hash used during transformation. 
      * 
      * @var array
      */
     protected $urls = array();
+    
     /**
      * Titles hash  used during transformation. 
      * 
      * @var array
      */
     protected $titles = array();
+    
     /**
      * 
      * @var array
      */
     protected $htmlHashes = array();
+    
     /**
      * Status flag to avoid invalid nesting.
      * 
-     * @var mixed
+     * @var boolean
      */
     protected $inAnchor = false;
+    
     /**
      * documentGamut 
      * 
@@ -124,6 +145,7 @@ class Parser
         "stripLinkDefinitions" => 20,
         "runBasicBlockGamut" => 30,
     );
+    
     /**
      * blockGamut 
      * 
@@ -138,6 +160,7 @@ class Parser
         "doCodeBlocks" => 50,
         "doBlockQuotes" => 60,
     );
+    
     /**
      * spanGamut 
      * 
@@ -163,6 +186,7 @@ class Parser
         "doItalicsAndBold" => 50,
         "doHardBreaks" => 60,
     );
+    
     /**
      * emRelist 
      * 
@@ -173,6 +197,7 @@ class Parser
         '*' => '(?<=\S|^)(?<!\*)\*(?!\*)',
         '_' => '(?<=\S|^)(?<!_)_(?!_)',
     );
+    
     /**
      * strongRelist 
      * 
@@ -183,6 +208,7 @@ class Parser
         '**' => '(?<=\S|^)(?<!\*)\*\*(?!\*)',
         '__' => '(?<=\S|^)(?<!_)__(?!_)',
     );
+    
     /**
      * emStrongRelist 
      * 
@@ -193,18 +219,21 @@ class Parser
         '***' => '(?<=\S|^)(?<!\*)\*\*\*(?!\*)',
         '___' => '(?<=\S|^)(?<!_)___(?!_)',
     );
+    
     /**
      * emStrongPreparedRelist 
      * 
      * @var mixed
      */
     protected $emStrongPreparedRelist;
+    
     /**
      * listLevel 
      * 
      * @var int
      */
     protected $listLevel = 0;
+    
 
     /**
      * Constructor
@@ -214,15 +243,15 @@ class Parser
         $this->_initDetab();
         $this->prepareItalicsAndBold();
 
-        $this->nestedBracketsRegex =
+        $this->nestedBracketsPattern =
                 str_repeat('(?>[^\[\]]+|\[', $this->nestedBracketsDepth) .
                 str_repeat('\])*', $this->nestedBracketsDepth);
 
-        $this->nestedUrlParenthesisRegex =
+        $this->nestedUrlParenthesisPattern =
                 str_repeat('(?>[^()\s]+|\(', $this->nestedUrlParenthesisDepth) .
                 str_repeat('(?>\)))*', $this->nestedUrlParenthesisDepth);
 
-        $this->escapeCharsRegex = '[' . preg_quote($this->escapeChars) . ']';
+        $this->escapeCharsPattern = '[' . preg_quote($this->escapeChars) . ']';
     }
 
     /**
@@ -646,7 +675,7 @@ class Parser
         $text = preg_replace_callback('{
                 (					# wrap whole match in $1
                   \[
-                        (' . $this->nestedBracketsRegex . ')	# link text = $2
+                        (' . $this->nestedBracketsPattern . ')	# link text = $2
                   \]
 
                   [ ]?				# one optional space
@@ -662,14 +691,14 @@ class Parser
         $text = preg_replace_callback('{
                 (				# wrap whole match in $1
                   \[
-                        (' . $this->nestedBracketsRegex . ')	# link text = $2
+                        (' . $this->nestedBracketsPattern . ')	# link text = $2
                   \]
                   \(			# literal paren
                         [ \n]*
                         (?:
                                 <(.+?)>	# href = $3
                         |
-                                (' . $this->nestedUrlParenthesisRegex . ')	# href = $4
+                                (' . $this->nestedUrlParenthesisPattern . ')	# href = $4
                         )
                         [ \n]*
                         (			# $5
@@ -773,7 +802,7 @@ class Parser
 		$text = preg_replace_callback('{
 			(				# wrap whole match in $1
 			  !\[
-				(' . $this->nestedBracketsRegex . ')		# alt text = $2
+				(' . $this->nestedBracketsPattern . ')		# alt text = $2
 			  \]
 
 			  [ ]?				# one optional space
@@ -793,7 +822,7 @@ class Parser
 		$text = preg_replace_callback('{
 			(				# wrap whole match in $1
 			  !\[
-				(' . $this->nestedBracketsRegex . ')		# alt text = $2
+				(' . $this->nestedBracketsPattern . ')		# alt text = $2
 			  \]
 			  \s?			# One optional whitespace character
 			  \(			# literal paren
@@ -801,7 +830,7 @@ class Parser
 				(?:
 					<(\S*)>	# src url = $3
 				|
-					(' . $this->nestedUrlParenthesisRegex . ')	# src url = $4
+					(' . $this->nestedUrlParenthesisPattern . ')	# src url = $4
 				)
 				[ \n]*
 				(			# $5
@@ -1516,7 +1545,7 @@ class Parser
 
         $span_re = '{
 				(
-					\\\\' . $this->escapeCharsRegex . '
+					\\\\' . $this->escapeCharsPattern . '
 				|
 					(?<![`\\\\])
 					`+						# code span marker
