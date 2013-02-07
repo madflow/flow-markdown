@@ -1,3 +1,5 @@
+[![Build Status](https://secure.travis-ci.org/madflow/node-rcommand.png)](http://travis-ci.org/madflow/flow-markdown)
+
 # README
 
 ## What is Markdown?
