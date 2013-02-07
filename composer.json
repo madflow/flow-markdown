@@ -6,6 +6,7 @@
     "homepage": "https://github.com/madflow/flow-markdown",
     "type": "library",
     "license": "BSD",
+     "bin": ["bin/markdown.php"],
     "authors": [
         {
             "name": "madflow"
