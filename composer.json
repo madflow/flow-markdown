@@ -5,7 +5,7 @@
     "keywords": ["markdown"],
     "homepage": "https://github.com/madflow/flow-markdown",
     "type": "library",
-    "license": "BSD",
+    "license": "BSD-2-Clause",
      "bin": ["bin/markdown.php"],
     "authors": [
         {
