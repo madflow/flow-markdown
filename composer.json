@@ -1,6 +1,7 @@
 {
     "name": "madflow/markdown",
     "description": "Markdown Parser for PHP",
+    "minimum-stability": "dev",
     "keywords": ["markdown"],
     "homepage": "https://github.com/madflow/flow-markdown",
     "type": "library",
