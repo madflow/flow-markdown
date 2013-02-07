@@ -1,13 +1,13 @@
 <?php
 
-namespace Flow\Markdown;
+namespace Madflow\Markdown;
 
 /**
  * Markdown Document Parser
  * 
  * Usage:
  * 
- * $parser = new \Flow\Markdown\Parser();
+ * $parser = new \Madflow\Markdown\Parser();
  * $html = $parser->transform('# Heading 1'); // <h1>Heading 1</h1>
  * 
  */

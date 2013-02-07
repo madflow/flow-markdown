@@ -1,8 +1,8 @@
 <?php
 
-namespace Flow\Markdown;
+namespace Madflow\Markdown;
 
-require_once dirname(__FILE__) . '/../src/Flow/Markdown/Parser.php';
+require_once dirname(__FILE__) . '/../src/Madflow/Markdown/Parser.php';
 require_once dirname(__FILE__) . '/PhpMarkdown.php';
 
 /**
