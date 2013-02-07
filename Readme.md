@@ -27,4 +27,4 @@ The plugins for Wordpress etc. have been dropped from the code.
 
 - PHP Markdown by Michel Fortin <http://michelf.com/> 
 
-- Mardown Syntax by John Gruber  <http://daringfireball.net/>
+- Markdown Syntax by John Gruber  <http://daringfireball.net/>
