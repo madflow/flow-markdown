@@ -1,0 +1,20 @@
+{
+    "name": "madflow/markdown",
+    "description": "Markdown Parser for PHP",
+    "minimum-stability": "dev",
+    "keywords": ["markdown"],
+    "homepage": "https://github.com/madflow/flow-markdown",
+    "type": "library",
+    "license": "BSD",
+    "authors": [
+        {
+            "name": "madflow"
+        }
+    ],
+    "autoload": {
+        "psr-0": { "Flow": "src/" }
+    },
+    "require": {
+        "php": ">=5.3.1"
+    }
+}
