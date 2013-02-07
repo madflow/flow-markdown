@@ -23,7 +23,7 @@ The plugins for Wordpress etc. have been dropped from the code.
 
 # Authors
 
-- Florian Reiss <http://github/madflow/> 
+- Florian Reiss <https://github.com/madflow/flow-markdown/>
 
 - PHP Markdown by Michel Fortin <http://michelf.com/> 
 
