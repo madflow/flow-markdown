@@ -17,23 +17,26 @@ The plugins for Wordpress etc. have been dropped from the code.
 # Installation
 
 - Put the repository in your composer.json file and require it.
-
+```
     "repositories": [
     {
         "type":"git",
         "url":"https://github.com/madflow/flow-markdown"
     }
     ],
-
+    
     "require": {
-        // ....
-        "madflow/markdown": "dev-master"
+    // ....
+    "madflow/markdown": "dev-master"
     },
+```
 
-- Execute _composer update_
+- Execute ```composer update```
 - Create instance and happily transform markdown to HTML. 
-   - $parser = new \Madflow\Markdown\Parser();
-   - $html = $parser->transform('# Markdown String');
+```
+   $parser = new \Madflow\Markdown\Parser();
+   $html = $parser->transform('# Markdown String');
+```
 
 # Authors
 
